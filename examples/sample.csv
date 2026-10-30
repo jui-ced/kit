@@ -1,0 +1,6 @@
+id,value,status
+A,10,ok
+B,,unknown
+C,30,ok
+C,30,ok
+D,NULL,review
