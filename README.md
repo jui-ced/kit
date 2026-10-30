@@ -5,7 +5,7 @@
 ## 시험 환경에서 가져오기
 
 ```bash
-git clone https://github.com/jui-ced/kit.git
+git clone --depth 1 https://github.com/jui-ced/kit.git
 ```
 
 제공된 Codex에 다음처럼 요청합니다.
@@ -69,6 +69,7 @@ make_samples.py는 합성 데이터만 사용하며 기존 샘플 파일을 덮�
 - templates/plan.md: 필수 조건, 자료 확인, 우선순위
 - templates/decisions.md: 선택 이유, 근거, 실제 검증, 외부 코드 출처
 - templates/submission.md: 실행법, 충족 조건, 한계, 제출 점검
+- templates/test_report.md: 정상·예외·경계 입력의 기대/실제 결과와 미실행 기록
 
 필요한 템플릿만 작업 공간에 복사하고 실제 시험의 파일명·양식을 따르세요. 빈 표나 예시를 완료 기록으로 제출하지 마세요.
 
@@ -87,6 +88,34 @@ make_samples.py는 합성 데이터만 사용하며 기존 샘플 파일을 덮�
 - 사용법·제출 절차는 Cofa Helper, 업무 맥락은 실무자 에이전트, 장애는 문제 신고를 이용합니다.
 - 외부 AI·개인 API 키·Computer Use·Git Push·제한 우회는 사용하지 않습니다. 외부 MCP로 시험 자료를 보내지 않습니다.
 
-## 출처와 범위
+## 추가된 빠른 도구
+
+기존 `tools/`, `templates/` 경로를 유지합니다. 제안된 `python/`, `documents/`와 역할이 같으며 중복 폴더를 만들지 않았습니다. 전체 준비 범위와 15분 점검은 [PREPARATION.md](PREPARATION.md)를 참고하세요.
+
+### 최소 점검 명령
+
+저장소 루트에서 실행합니다. 아래 도구는 표준 라이브러리만 사용합니다.
+
+```bash
+python tools/inspect_csv.py examples/sample.csv
+python tools/analyze_data.py examples/sample.csv --value value --group status
+python tools/analyze_data.py examples/sample.csv --value value --where status=ok
+python tools/validate_json.py examples/sample.json --each --required id status
+python -m unittest discover -s tests -v
+```
+
+- CSV 집계: JSON 배열 출력. `ok` 그룹은 3행, 평균 약 23.3333, 최솟값 10, 최댓값 30입니다. 빈칸은 `missing`, NULL·NaN·무한대 등 숫자가 아닌 값은 `invalid`로 셉니다. 원본과 중복은 보존합니다. `--where COLUMN=VALUE`는 문자열 정확 일치이며 `--encoding cp949`를 지정할 수 있습니다. 빈 파일·중복 헤더·열 개수 불일치는 오류입니다. 헤더만 있거나 필터 결과가 없으면 빈 배열입니다. 통계는 유효한 숫자만 대상으로 하며 해당 값들을 메모리에 저장합니다.
+- JSON 검증: 문법, 중복 키, 비표준 NaN/Infinity, 필수 필드 누락/null을 확인합니다. `--each`는 배열의 모든 객체를 검사합니다. 샘플의 id/status 검사는 3개 통과하며 value를 필수로 지정하면 null 때문에 실패합니다. 빈 배열은 0개 검사로 통과합니다. 빈 문자열·자료형·중첩 필드·JSON Schema 검증은 포함하지 않습니다.
+- API 점검: `python tools/smoke_test.py URL --status 200 --required ok`. HTTP 상태와 최상위 JSON 필드 존재/non-null을 확인합니다. 값의 의미까지 검증하지 않으며 시간 제한 기본값은 5초입니다. 명시한 URL에 GET 요청하므로 허용된 내부 API에만 사용하세요.
+- 위 세 도구는 성공 시 종료 코드 0, 검증 실패·읽기 오류 시 1, 잘못된 명령 인자 시 2입니다.
+- Excel/PDF 패키지가 없으면 해당 테스트 2개는 **skipped**로 표시됩니다. 통과로 간주하지 마세요. 선택 의존성을 설치한 뒤 전체 테스트를 실행하면 함께 검증합니다.
+
+### 프롬프트와 웹 예제
+
+`prompts/01_analyze_requirements.md` → `02_implementation.md` → 필요시 `03_debugging.md` → `04_verification.md` → `05_final_review.md` 순서로 필요한 내용을 복사합니다. 대괄호 자리에는 실제 단계·명령·오류를 적습니다.
+
+웹이 필요한 경우 [web/README.md](web/README.md)의 명령으로 API와 대시보드를 함께 실행합니다. 외부 패키지·CDN 없이 폼·버튼·표·막대 그래프를 제공합니다.
+
+## 출처 고지
 
 코드와 템플릿은 이 저장소를 위해 작성되었습니다. 실제 시험 문제·제공 파일·답안은 포함하지 않습니다. 의존 패키지는 각각의 라이선스를 따릅니다. AGENTS.md는 일반 작업 지침이며 설치형 Skill이나 에이전트 하네스는 포함하지 않습니다.

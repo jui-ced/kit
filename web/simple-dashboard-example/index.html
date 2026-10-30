@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>숫자 요약 예제</title>
+<style>
+body{font:18px system-ui;max-width:760px;margin:48px auto;padding:0 20px;color:#182539;background:#f5f7fa}input,button{font:inherit;padding:12px}input{width:65%;max-width:440px}button{cursor:pointer}table{border-collapse:collapse;width:100%;background:white;margin:24px 0}th,td{padding:14px;border-bottom:1px solid #ddd;text-align:left}.bar{height:18px;background:#196bba;display:inline-block}li{margin:12px 0}#message{min-height:28px}
+</style>
+<h1>숫자 요약</h1><p>쉼표로 구분한 숫자의 평균·최솟값·최댓값을 확인합니다.</p>
+<form id="form"><label for="values">분석할 숫자</label><p><input id="values" value="10,20,30" required maxlength="10000"><button>분석</button></p></form>
+<p id="message" role="status" aria-live="polite"></p>
+<table><caption>분석 결과</caption><thead><tr><th>항목</th><th>값</th></tr></thead><tbody id="result"></tbody></table>
+<h2>입력값 크기</h2><p>막대 길이는 절댓값 기준이며, 부호는 숫자로 표시합니다. 최대 100개를 표시합니다.</p><ol id="chart"></ol>
+<script>
+document.getElementById('form').addEventListener('submit',async event=>{
+  event.preventDefault();
+  const result=document.getElementById('result'),chart=document.getElementById('chart'),message=document.getElementById('message');
+  result.replaceChildren();chart.replaceChildren();message.textContent='분석 중…';
+  const button=event.target.querySelector('button');button.disabled=true;
+  try{
+    const raw=document.getElementById('values').value;
+    const response=await fetch('/api/summary?values='+encodeURIComponent(raw));
+    const data=await response.json();if(!response.ok)throw new Error(data.error||'요청 실패');
+    for(const [key,label] of [['count','개수'],['mean','평균'],['min','최솟값'],['max','최댓값']]){
+      const row=document.createElement('tr');for(const text of [label,data[key]]){const cell=document.createElement('td');cell.textContent=text;row.append(cell);}result.append(row);
+    }
+    const values=raw.split(',').map(Number).slice(0,100),scale=Math.max(...values.map(Math.abs))||1;
+    for(const value of values){const item=document.createElement('li'),bar=document.createElement('span');bar.className='bar';bar.style.width=(Math.abs(value)/scale*70)+'%';item.append(document.createTextNode(value+' '),bar);chart.append(item);}
+    message.textContent='분석 완료';
+  }catch(error){message.textContent='오류: '+error.message;}finally{button.disabled=false;}
+});
+</script>
+</html>

@@ -42,6 +42,7 @@ class CSVTests(unittest.TestCase):
 
 
 class DocumentTests(unittest.TestCase):
+    @unittest.skipUnless(importlib.util.find_spec('openpyxl'), 'optional dependency: openpyxl')
     def test_xlsx_formula_preserved(self):
         from openpyxl import Workbook
         with tempfile.TemporaryDirectory() as folder:
@@ -53,6 +54,7 @@ class DocumentTests(unittest.TestCase):
             result = load('inspect_excel').inspect(path)
             self.assertEqual(result['sheets'][0]['samples'], [['=1+1']])
 
+    @unittest.skipUnless(importlib.util.find_spec('pypdf'), 'optional dependency: pypdf')
     def test_pdf_page_labels_and_empty_page(self):
         from pypdf import PdfWriter
         with tempfile.TemporaryDirectory() as folder:
