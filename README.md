@@ -68,7 +68,7 @@ make_samples.py는 합성 데이터만 사용하며 기존 샘플 파일을 덮�
 
 - templates/plan.md: 필수 조건, 자료 확인, 우선순위
 - templates/decisions.md: 선택 이유, 근거, 실제 검증, 외부 코드 출처
-- [DECISION_LOG.md](DECISION_LOG.md): 알고리즘 원리·구성·대안 비교·사용자 선택·구현 이유·실측 효율을 기록하는 상세 양식과 버스 노선 설명 예시
+- [DECISION_LOG.md](DECISION_LOG.md): 알고리즘 원리·구성·대안 비교·사용자 선택·구현 이유·실측 효율을 기록하는 범용 상세 양식과 사용자 선택 질문 예시
 - templates/submission.md: 실행법, 충족 조건, 한계, 제출 점검
 - templates/test_report.md: 정상·예외·경계 입력의 기대/실제 결과와 미실행 기록
 - templates/stakeholder_questions.md: 현직자에게 물을 구체적 질문, 후속 질문, 개발자 판단 요청 예시
